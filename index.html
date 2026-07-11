@@ -215,19 +215,47 @@
         document.getElementById('totalAmount').textContent = `${expenses.reduce((s, e) => s + e.amount, 0).toLocaleString('ru', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₽`;
     }
 
+    // Обновленный экспорт (защита от переименования в .txt на Android)
     window.exportToCSV = async () => {
         if (expenses.length === 0) return alert('Нет данных для экспорта');
-        let csv = "\uFEFFID;Категория;Описание;Сумма;Литры;Цена;Дата\n";
-        expenses.forEach(e => { csv += `${e.id};${catNames[e.category] || e.category};"${e.description.replace(/"/g, '""')}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\n`; });
-        const file = new File([new Blob([csv], { type: 'text/csv;charset=utf-8;' })], `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`, { type: 'text/csv' });
         
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try { await navigator.share({ files: [file], title: 'Расходы', text: 'Бэкап расходов' }); return; } catch (err) {}
+        let csv = "\uFEFFID;Категория;Описание;Сумма;Литры;Цена;Дата\n";
+        expenses.forEach(e => { 
+            csv += `${e.id};${catNames[e.category] || e.category};"${e.description.replace(/"/g, '""')}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\n`; 
+        });
+
+        const fileName = `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`;
+        
+        // Используем application/octet-stream, чтобы Android не менял расширение на .txt
+        const blob = new Blob([csv], { type: 'application/octet-stream' });
+        
+        if (navigator.canShare) {
+            const file = new File([blob], fileName, { type: 'application/octet-stream' });
+            if (navigator.canShare({ files: [file] })) {
+                try { 
+                    await navigator.share({ 
+                        files: [file], 
+                        title: 'Расходы', 
+                        text: 'Бэкап расходов' 
+                    }); 
+                    return; 
+                } catch (err) {
+                    console.log('Отправка отменена', err);
+                }
+            }
         }
-        const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        
+        const a = document.createElement("a"); 
+        const url = URL.createObjectURL(blob);
+        a.href = url; 
+        a.download = fileName; 
+        document.body.appendChild(a); 
+        a.click(); 
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
     };
 
-    // Обновленный бронебойный механизм импорта для Android
+    // Бронебойный механизм импорта для Android
     importFileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -248,7 +276,6 @@
                     if (rows.length <= 1) throw new Error('Нет данных или только заголовки');
 
                     const imported = [];
-                    // Определяем, чем разделены столбцы (точкой с запятой или просто запятой)
                     const separator = rows[0].includes(';') ? ';' : ',';
 
                     for (let i = 1; i < rows.length; i++) {
@@ -283,11 +310,10 @@
         };
 
         reader.onerror = function() {
-            alert('Android не дал браузеру прочитать файл. Попробуйте сначала переместить этот файл в стандартную папку "Загрузки" на вашем телефоне.');
+            alert('Не удалось прочитать файл. Попробуйте переместить его в папку "Загрузки" (Downloads) на телефоне и выбрать оттуда.');
         };
 
         reader.onloadend = function() {
-            // Очищаем форму выбора файла ТОЛЬКО после завершения всех процессов
             e.target.value = '';
         };
 
