@@ -9,261 +9,47 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --secondary: #4b5563;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --radius-lg: 16px;
-            --radius-md: 12px;
+            --primary: #2563eb; --primary-hover: #1d4ed8; --secondary: #4b5563;
+            --danger: #dc2626; --bg: #f8fafc; --card-bg: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+            --radius-lg: 16px; --radius-md: 12px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            padding: 16px;
-            padding-bottom: 120px; /* Отступ под нижнюю панель */
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 14px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-main);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px; /* Защита от авто-зума в Safari на iOS */
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background-color: #f8fafc;
-            color: var(--text-main);
-            outline: none;
-            transition: all 0.2s;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--primary);
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .gas-fields {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        button, .btn-label-import {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            border: none;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:active {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 12px;
-            font-size: 14px;
-        }
-
-        .btn-label-import {
-            background-color: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 12px;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .data-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .expense-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .expense-item:last-child {
-            border-bottom: none;
-        }
-
-        .expense-info {
-            flex: 1;
-            padding-right: 12px;
-        }
-
-        .expense-category {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .expense-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin: 4px 0;
-        }
-
-        .expense-meta {
-            font-size: 11px;
-            color: var(--text-muted);
-            background: #f1f5f9;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .expense-right {
-            text-align: right;
-        }
-
-        .expense-amount {
-            font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .btn-action {
-            padding: 6px 10px;
-            font-size: 12px;
-            border-radius: 6px;
-            width: auto;
-        }
-
-        .btn-action.edit {
-            background-color: #f1f5f9;
-            color: var(--secondary);
-        }
-
-        .btn-action.delete {
-            background-color: #fee2e2;
-            color: var(--danger);
-        }
-
-        .cancel-edit {
-            display: none;
-            margin-top: 8px;
-            background-color: #f1f5f9;
-            color: var(--text-main);
-        }
-
-        .total-panel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            padding: 16px 20px;
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--border);
-            z-index: 100;
-        }
-
-        .total-label {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .total-amount {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--primary);
-        }
-
-        .empty-state {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 20px 0;
-            font-size: 14px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 16px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 500px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { font-size: 22px; font-weight: 700; color: var(--text-main); }
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); margin-bottom: 16px; border: 1px solid var(--border); }
+        .card-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
+        input, select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background-color: #f8fafc; color: var(--text-main); outline: none; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .gas-fields { display: none; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button, .btn-label-import { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-md); cursor: pointer; transition: background-color 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:active { background-color: var(--primary-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 12px; font-size: 14px; }
+        .btn-label-import { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 12px; font-size: 14px; margin: 0; }
+        .data-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .expense-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .expense-item:last-child { border-bottom: none; }
+        .expense-info { flex: 1; padding-right: 12px; }
+        .expense-category { font-weight: 600; font-size: 15px; }
+        .expense-desc { font-size: 13px; color: var(--text-muted); margin: 4px 0; }
+        .expense-meta { font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+        .expense-right { text-align: right; }
+        .expense-amount { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+        .item-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-action { padding: 6px 10px; font-size: 12px; border-radius: 6px; width: auto; }
+        .btn-action.edit { background-color: #f1f5f9; color: var(--secondary); }
+        .btn-action.delete { background-color: #fee2e2; color: var(--danger); }
+        .cancel-edit { display: none; margin-top: 8px; background-color: #f1f5f9; color: var(--text-main); }
+        .total-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 16px 20px; box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); z-index: 100; }
+        .total-label { font-size: 15px; font-weight: 600; color: var(--text-muted); }
+        .total-amount { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .empty-state { text-align: center; color: var(--text-muted); padding: 20px 0; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -277,7 +63,6 @@
         <div class="card-title" id="formTitle">Новый расход</div>
         <form id="expenseForm">
             <input type="hidden" id="editId">
-            
             <div class="form-group">
                 <label for="category">Категория</label>
                 <select id="category" required>
@@ -292,28 +77,18 @@
                     <option value="other">🛍️ Прочие расходы</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label for="description">Описание</label>
                 <input type="text" id="description" placeholder="Например: Супермаркет, Отель, АЗС" required>
             </div>
-
             <div class="form-group" id="amountGroup">
                 <label for="amount">Сумма (₽)</label>
                 <input type="number" id="amount" placeholder="0" min="0" step="0.01">
             </div>
-
             <div class="gas-fields" id="gasGroup">
-                <div class="form-group">
-                    <label for="liters">Литры</label>
-                    <input type="number" id="liters" placeholder="0" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="pricePerLiter">Цена за литр (₽)</label>
-                    <input type="number" id="pricePerLiter" placeholder="0" min="0" step="0.01">
-                </div>
+                <div class="form-group"><label for="liters">Литры</label><input type="number" id="liters" placeholder="0" min="0" step="0.01"></div>
+                <div class="form-group"><label for="pricePerLiter">Цена за литр (₽)</label><input type="number" id="pricePerLiter" placeholder="0" min="0" step="0.01"></div>
             </div>
-
             <button type="submit" class="btn-primary" id="submitBtn">➕ Добавить расход</button>
             <button type="button" class="cancel-edit" id="cancelBtn">Отменить редактирование</button>
         </form>
@@ -340,13 +115,8 @@
 </div>
 
 <script>
-    // Регистрация Service Worker для оффлайн режима
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(reg => {
-                console.log('Service Worker успешно запущен', reg);
-            }).catch(err => console.log('Ошибка запуска Service Worker', err));
-        });
+        window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
     }
 
     let expenses = JSON.parse(localStorage.getItem('vacation_app_data_v3')) || [];
@@ -366,55 +136,26 @@
     const editIdInput = document.getElementById('editId');
     const importFileInput = document.getElementById('importFile');
 
-    const catNames = { 
-        shopping: '📦 Подготовка', 
-        shops: '🛒 Магазины', 
-        hotels: '🏨 Гостиницы', 
-        gas: '⛽ Бензин', 
-        toll_roads: '🛣️ Дороги', 
-        road_food: '🥪 Еда в дороге', 
-        food: '🍽️ Рестораны', 
-        entertainment: '🎢 Развлечения', 
-        other: '🛍️ Прочее' 
-    };
+    const catNames = { shopping: '📦 Подготовка', shops: '🛒 Магазины', hotels: '🏨 Гостиницы', gas: '⛽ Бензин', toll_roads: '🛣️ Дороги', road_food: '🥪 Еда в дороге', food: '🍽️ Рестораны', entertainment: '🎢 Развлечения', other: '🛍️ Прочее' };
 
-    // Переключение полей бензина
     categorySelect.addEventListener('change', (e) => {
         if (e.target.value === 'gas') {
-            amountGroup.style.display = 'none';
-            gasGroup.style.display = 'grid';
-            amountInput.removeAttribute('required');
-            litersInput.required = true;
-            priceInput.required = true;
+            amountGroup.style.display = 'none'; gasGroup.style.display = 'grid';
+            amountInput.removeAttribute('required'); litersInput.required = true; priceInput.required = true;
         } else {
-            amountGroup.style.display = 'block';
-            gasGroup.style.display = 'none';
-            amountInput.required = true;
-            litersInput.removeAttribute('required');
-            priceInput.removeAttribute('required');
+            amountGroup.style.display = 'block'; gasGroup.style.display = 'none';
+            amountInput.required = true; litersInput.removeAttribute('required'); priceInput.removeAttribute('required');
         }
     });
 
-    // Добавление / Редактирование
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-
         const id = editIdInput.value || Date.now().toString();
         const category = categorySelect.value;
         const description = document.getElementById('description').value.trim();
-        let amount = 0;
-        let liters = 0;
-        let pricePerLiter = 0;
+        let amount = category === 'gas' ? (parseFloat(litersInput.value)||0) * (parseFloat(priceInput.value)||0) : parseFloat(amountInput.value)||0;
 
-        if (category === 'gas') {
-            liters = parseFloat(litersInput.value) || 0;
-            pricePerLiter = parseFloat(priceInput.value) || 0;
-            amount = liters * pricePerLiter;
-        } else {
-            amount = parseFloat(amountInput.value) || 0;
-        }
-
-        const expense = { id, category, description, amount, liters, pricePerLiter, date: new Date().toISOString() };
+        const expense = { id, category, description, amount, liters: parseFloat(litersInput.value)||0, pricePerLiter: parseFloat(priceInput.value)||0, date: new Date().toISOString() };
 
         if (editIdInput.value) {
             expenses = expenses.map(item => item.id === id ? expense : item);
@@ -423,160 +164,98 @@
             expenses.unshift(expense);
         }
 
-        saveAndRender();
-        form.reset();
-        categorySelect.dispatchEvent(new Event('change'));
+        saveAndRender(); form.reset(); categorySelect.dispatchEvent(new Event('change'));
     });
 
     window.editE = function(id) {
         const e = expenses.find(x => x.id === id);
         if (!e) return;
-
-        editIdInput.value = e.id;
-        categorySelect.value = e.category;
-        document.getElementById('description').value = e.description;
+        editIdInput.value = e.id; categorySelect.value = e.category; document.getElementById('description').value = e.description;
         categorySelect.dispatchEvent(new Event('change'));
-
-        if (e.category === 'gas') {
-            litersInput.value = e.liters;
-            priceInput.value = e.pricePerLiter;
-        } else {
-            amountInput.value = e.amount;
-        }
-
-        formTitle.textContent = '📝 Редактирование';
-        submitBtn.textContent = '💾 Сохранить изменения';
-        cancelBtn.style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (e.category === 'gas') { litersInput.value = e.liters; priceInput.value = e.pricePerLiter; } else amountInput.value = e.amount;
+        formTitle.textContent = '📝 Редактирование'; submitBtn.textContent = '💾 Сохранить изменения'; cancelBtn.style.display = 'block'; window.scrollTo(0,0);
     };
 
     window.delE = function(id) {
-        if (confirm('Удалить эту запись?')) {
-            expenses = expenses.filter(e => e.id !== id);
-            saveAndRender();
-        }
+        if (confirm('Удалить эту запись?')) { expenses = expenses.filter(e => e.id !== id); saveAndRender(); }
     };
 
-    cancelBtn.addEventListener('click', () => {
-        resetFormState();
-        form.reset();
-        categorySelect.dispatchEvent(new Event('change'));
-    });
+    cancelBtn.addEventListener('click', () => { resetFormState(); form.reset(); categorySelect.dispatchEvent(new Event('change')); });
 
     function resetFormState() {
-        editIdInput.value = '';
-        formTitle.textContent = 'Новый расход';
-        submitBtn.textContent = '➕ Добавить расход';
-        cancelBtn.style.display = 'none';
+        editIdInput.value = ''; formTitle.textContent = 'Новый расход'; submitBtn.textContent = '➕ Добавить расход'; cancelBtn.style.display = 'none';
     }
 
     function saveAndRender() {
         localStorage.setItem('vacation_app_data_v3', JSON.stringify(expenses));
-        renderExpenses();
-        updateTotal();
-    }
-
-    function renderExpenses() {
         expenseList.innerHTML = '';
         if (expenses.length === 0) {
             expenseList.innerHTML = '<div class="empty-state">Список пуст. Добавьте первый расход.</div>';
-            return;
-        }
-
-        expenses.forEach(exp => {
-            const item = document.createElement('div');
-            item.className = 'expense-item';
-            const meta = exp.category === 'gas' ? `${exp.liters}л × ${exp.pricePerLiter}₽` : new Date(exp.date).toLocaleDateString('ru');
-
-            item.innerHTML = `
-                <div class="expense-info">
-                    <div class="expense-category">${catNames[exp.category] || exp.category}</div>
-                    <div class="expense-desc">${exp.description}</div>
-                    <div class="expense-meta">${meta}</div>
-                </div>
-                <div class="expense-right">
-                    <div class="expense-amount">${exp.amount.toLocaleString('ru')} ₽</div>
-                    <div class="item-actions">
-                        <button class="btn-action edit" onclick="editE('${exp.id}')">Правка</button>
-                        <button class="btn-action delete" onclick="delE('${exp.id}')">Х</button>
+        } else {
+            expenses.forEach(exp => {
+                const item = document.createElement('div');
+                item.className = 'expense-item';
+                const meta = exp.category === 'gas' ? `${exp.liters}л × ${exp.pricePerLiter}₽` : new Date(exp.date).toLocaleDateString('ru');
+                item.innerHTML = `
+                    <div class="expense-info">
+                        <div class="expense-category">${catNames[exp.category] || exp.category}</div>
+                        <div class="expense-desc">${exp.description}</div>
+                        <div class="expense-meta">${meta}</div>
                     </div>
-                </div>
-            `;
-            expenseList.appendChild(item);
-        });
+                    <div class="expense-right">
+                        <div class="expense-amount">${exp.amount.toLocaleString('ru')} ₽</div>
+                        <div class="item-actions">
+                            <button class="btn-action edit" onclick="editE('${exp.id}')">Правка</button>
+                            <button class="btn-action delete" onclick="delE('${exp.id}')">Х</button>
+                        </div>
+                    </div>`;
+                expenseList.appendChild(item);
+            });
+        }
+        document.getElementById('totalAmount').textContent = `${expenses.reduce((s, e) => s + e.amount, 0).toLocaleString('ru', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₽`;
     }
 
-    function updateTotal() {
-        const total = expenses.reduce((s, e) => s + e.amount, 0);
-        totalAmount.textContent = `${total.toLocaleString('ru', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₽`;
-    }
-
-    // Умный Экспорт (с вызовом системной шторки смартфона)
     window.exportToCSV = async () => {
-        if (expenses.length === 0) {
-            alert('Нет данных для экспорта');
-            return;
-        }
-
+        if (expenses.length === 0) return alert('Нет данных для экспорта');
         let csv = "\uFEFFID;Категория;Описание;Сумма;Литры;Цена;Дата\n";
-        expenses.forEach(e => {
-            csv += `${e.id};${catNames[e.category] || e.category};"${e.description.replace(/"/g, '""')}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\n`;
-        });
-
-        const fileName = `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`;
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const file = new File([blob], fileName, { type: 'text/csv' });
-
+        expenses.forEach(e => { csv += `${e.id};${catNames[e.category] || e.category};"${e.description.replace(/"/g, '""')}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\n`; });
+        const file = new File([new Blob([csv], { type: 'text/csv;charset=utf-8;' })], `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`, { type: 'text/csv' });
+        
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: 'Расходы на отпуск',
-                    text: 'Бэкап расходов'
-                });
-                return;
-            } catch (err) {
-                console.log('Экспорт через Share отменен или произошла ошибка:', err);
-            }
+            try { await navigator.share({ files: [file], title: 'Расходы', text: 'Бэкап расходов' }); return; } catch (err) {}
         }
-
-        // Альтернативный вариант скачивания для ПК
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     };
 
-    // Мобильный безопасный импорт
+    // Обновленный бронебойный механизм импорта для Android
     importFileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
+
         reader.onload = function(ev) {
             try {
                 const text = ev.target.result;
+                if (!text) throw new Error('Файл пуст');
 
                 if (file.name.toLowerCase().endsWith('.json')) {
                     const parsed = JSON.parse(text);
-                    if (Array.isArray(parsed)) {
-                        expenses = parsed;
-                    } else {
-                        throw new Error('Некорректный формат JSON');
-                    }
+                    if (Array.isArray(parsed)) expenses = parsed;
+                    else throw new Error('Некорректный JSON');
                 } else {
                     const rows = text.split(/\r?\n/).filter(r => r.trim() !== '');
-                    if (rows.length <= 1) throw new Error('Файл не содержит данных');
+                    if (rows.length <= 1) throw new Error('Нет данных или только заголовки');
 
                     const imported = [];
+                    // Определяем, чем разделены столбцы (точкой с запятой или просто запятой)
+                    const separator = rows[0].includes(';') ? ';' : ',';
+
                     for (let i = 1; i < rows.length; i++) {
-                        const c = rows[i].split(';');
+                        const c = rows[i].split(separator);
                         if (c.length >= 4) {
                             let catKey = Object.keys(catNames).find(key => catNames[key] === c[1]) || 'other';
                             let cleanDesc = (c[2] || '').replace(/^"|"$/g, '').replace(/""/g, '"');
-
                             imported.push({
                                 id: c[0] || (Date.now().toString() + i),
                                 category: catKey,
@@ -588,30 +267,34 @@
                             });
                         }
                     }
-                    if (imported.length === 0) throw new Error('Не удалось прочитать строки');
-                    
-                    if (confirm(`Обнаружено ${imported.length} записей. Перезаписать список? (Отмена объединит данные)`)) {
+                    if (imported.length === 0) throw new Error('Формат файла не распознан');
+
+                    if (confirm(`Обнаружено ${imported.length} записей. Заменить весь список? (Отмена = добавить к текущим)`)) {
                         expenses = imported;
                     } else {
                         expenses = [...imported, ...expenses];
                     }
                 }
-
                 saveAndRender();
-                alert('Данные успешно импортированы!');
+                setTimeout(() => alert('Данные успешно загружены!'), 100);
             } catch (err) {
-                alert('Ошибка импорта: ' + err.message);
+                alert('Ошибка: ' + err.message);
             }
         };
 
+        reader.onerror = function() {
+            alert('Android не дал браузеру прочитать файл. Попробуйте сначала переместить этот файл в стандартную папку "Загрузки" на вашем телефоне.');
+        };
+
+        reader.onloadend = function() {
+            // Очищаем форму выбора файла ТОЛЬКО после завершения всех процессов
+            e.target.value = '';
+        };
+
         reader.readAsText(file);
-        this.value = ''; // Сброс инпута
     });
 
-    // Старт
-    categorySelect.dispatchEvent(new Event('change'));
-    renderExpenses();
-    updateTotal();
+    categorySelect.dispatchEvent(new Event('change')); saveAndRender();
 </script>
 </body>
 </html>
