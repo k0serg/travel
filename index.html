@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Калькулятор отпуска</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        :root {
+            --primary: #2563eb; --primary-hover: #1d4ed8; --secondary: #4b5563;
+            --danger: #dc2626; --bg: #f8fafc; --card-bg: #ffffff;
+            --text-main: #0f172a; --text-muted: #64748b; --border: #e2e8f0;
+            --radius-lg: 16px; --radius-md: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 16px; padding-bottom: 120px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 500px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 20px; }
+        h1 { font-size: 22px; font-weight: 700; }
+        .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px; border: 1px solid var(--border); }
+        .card-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: var(--text-muted); text-transform: uppercase; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        input, select { width: 100%; padding: 12px; font-size: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background-color: #f8fafc; color: var(--text-main); outline: none; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .gas-fields { display: none; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-md); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); padding: 10px; font-size: 14px; }
+        .data-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .expense-item { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+        .expense-info { flex: 1; padding-right: 12px; }
+        .expense-category { font-weight: 600; font-size: 15px; }
+        .expense-desc { font-size: 13px; color: var(--text-muted); margin: 4px 0; }
+        .expense-meta { font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+        .expense-right { text-align: right; }
+        .expense-amount { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+        .item-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-action { padding: 6px 10px; font-size: 12px; border-radius: 6px; width: auto; }
+        .btn-action.edit { background: #f1f5f9; }
+        .btn-action.delete { background: #fee2e2; color: var(--danger); }
+        .cancel-edit { display: none; margin-top: 8px; background: #f1f5f9; }
+        .total-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); z-index: 100; }
+        .total-label { font-size: 15px; font-weight: 600; color: var(--text-muted); }
+        .total-amount { font-size: 22px; font-weight: 800; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>📊 Калькулятор поездки</h1></header>
+
+    <div class="card">
+        <div class="card-title" id="formTitle">Новый расход</div>
+        <form id="expenseForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="category">Категория</label>
+                <select id="category" required>
+                    <option value="shopping">📦 Подготовка к отпуску</option>
+                    <option value="shops">🛒 Магазины</option>
+                    <option value="hotels">🏨 Гостиницы / Жилье</option>
+                    <option value="gas">⛽ Бензин</option>
+                    <option value="toll_roads">🛣️ Платные дороги</option>
+                    <option value="road_food">🥪 Еда в дороге</option>
+                    <option value="food">🍽️ Рестораны и кафе</option>
+                    <option value="entertainment">🎢 Развлечения</option>
+                    <option value="other">🛍️ Прочие расходы</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Описание</label>
+                <input type="text" id="description" placeholder="Например: Супермаркет, Отель" required>
+            </div>
+            <div class="form-group" id="amountGroup">
+                <label for="amount">Сумма (₽)</label>
+                <input type="number" id="amount" placeholder="0" min="0" step="0.01">
+            </div>
+            <div class="gas-fields" id="gasGroup">
+                <div class="form-group"><label for="liters">Литры</label><input type="number" id="liters" placeholder="0" step="0.01"></div>
+                <div class="form-group"><label for="pricePerLiter">Цена/литр</label><input type="number" id="pricePerLiter" placeholder="0" step="0.01"></div>
+            </div>
+            <button type="submit" class="btn-primary" id="submitBtn">➕ Добавить</button>
+            <button type="button" class="cancel-edit" id="cancelBtn">Отменить</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Синхронизация</div>
+        <div class="data-actions">
+            <button type="button" class="btn-outline" onclick="exportToCSV()">📤 Экспорт</button>
+            <button type="button" class="btn-outline" onclick="document.getElementById('importFile').click()">📥 Импорт</button>
+        </div>
+        <input type="file" id="importFile" accept=".csv,.json" style="display: none;">
+    </div>
+
+    <div class="card">
+        <div class="card-title">История</div>
+        <div class="expense-list" id="expenseList"></div>
+    </div>
+</div>
+
+<div class="total-panel">
+    <div class="total-label">ОБЩИЙ ИТОГ:</div>
+    <div class="total-amount" id="totalAmount">0 ₽</div>
+</div>
+
+<script>
+    // Регистрация Service Worker для работы оффлайн
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('Service Worker зарегистрирован', reg);
+            }).catch(err => console.log('Ошибка регистрации SW', err));
+        });
+    }
+
+    let expenses = JSON.parse(localStorage.getItem('vacation_app_data')) || [];
+    const form = document.getElementById('expenseForm');
+    const categorySelect = document.getElementById('category');
+    const amountGroup = document.getElementById('amountGroup');
+    const gasGroup = document.getElementById('gasGroup');
+    const amountInput = document.getElementById('amount');
+    const litersInput = document.getElementById('liters');
+    const priceInput = document.getElementById('pricePerLiter');
+    const expenseList = document.getElementById('expenseList');
+    const editIdInput = document.getElementById('editId');
+
+    const catNames = { shopping: '📦 Подготовка', shops: '🛒 Магазины', hotels: '🏨 Гостиницы', gas: '⛽ Бензин', toll_roads: '🛣️ Дороги', road_food: '🥪 Еда в дороге', food: '🍽️ Рестораны', entertainment: '🎢 Развлечения', other: '🛍️ Прочее' };
+
+    categorySelect.addEventListener('change', (e) => {
+        if (e.target.value === 'gas') {
+            amountGroup.style.display = 'none'; gasGroup.style.display = 'grid';
+            amountInput.removeAttribute('required'); litersInput.required = true; priceInput.required = true;
+        } else {
+            amountGroup.style.display = 'block'; gasGroup.style.display = 'none';
+            amountInput.required = true; litersInput.removeAttribute('required'); priceInput.removeAttribute('required');
+        }
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const id = editIdInput.value || Date.now().toString();
+        const category = categorySelect.value;
+        const description = document.getElementById('description').value;
+        let amount = category === 'gas' ? (parseFloat(litersInput.value)||0) * (parseFloat(priceInput.value)||0) : parseFloat(amountInput.value)||0;
+        
+        const exp = { id, category, description, amount, liters: litersInput.value, pricePerLiter: priceInput.value, date: new Date().toISOString() };
+        
+        if (editIdInput.value) {
+            expenses = expenses.map(item => item.id === id ? exp : item);
+            document.getElementById('cancelBtn').style.display = 'none';
+        } else {
+            expenses.unshift(exp);
+        }
+        
+        editIdInput.value = ''; form.reset(); categorySelect.dispatchEvent(new Event('change'));
+        saveAndRender();
+    });
+
+    function saveAndRender() {
+        localStorage.setItem('vacation_app_data', JSON.stringify(expenses));
+        expenseList.innerHTML = expenses.length ? '' : '<div style="text-align:center; padding:20px; color:#64748b">Нет записей</div>';
+        expenses.forEach(exp => {
+            const meta = exp.category === 'gas' ? `${exp.liters}л × ${exp.pricePerLiter}₽` : new Date(exp.date).toLocaleDateString('ru');
+            expenseList.innerHTML += `
+                <div class="expense-item">
+                    <div class="expense-info">
+                        <div class="expense-category">${catNames[exp.category]}</div>
+                        <div class="expense-desc">${exp.description}</div>
+                        <div class="expense-meta">${meta}</div>
+                    </div>
+                    <div class="expense-right">
+                        <div class="expense-amount">${exp.amount.toLocaleString('ru')} ₽</div>
+                        <div class="item-actions">
+                            <button class="btn-action edit" onclick="editE('${exp.id}')">Правка</button>
+                            <button class="btn-action delete" onclick="delE('${exp.id}')">Х</button>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('totalAmount').textContent = `${expenses.reduce((s, e) => s + e.amount, 0).toLocaleString('ru')} ₽`;
+    }
+
+    window.delE = id => { if(confirm('Удалить?')) { expenses = expenses.filter(e => e.id !== id); saveAndRender(); }};
+    window.editE = id => {
+        const e = expenses.find(x => x.id === id); if(!e) return;
+        editIdInput.value = e.id; categorySelect.value = e.category; document.getElementById('description').value = e.description;
+        categorySelect.dispatchEvent(new Event('change'));
+        if(e.category === 'gas') { litersInput.value = e.liters; priceInput.value = e.pricePerLiter; } else amountInput.value = e.amount;
+        document.getElementById('cancelBtn').style.display = 'block'; window.scrollTo(0,0);
+    };
+    document.getElementById('cancelBtn').onclick = () => { editIdInput.value = ''; form.reset(); document.getElementById('cancelBtn').style.display = 'none'; };
+
+    window.exportToCSV = () => {
+        let csv = "\\uFEFFID;Категория;Описание;Сумма;Литры;Цена;Дата\\n";
+        expenses.forEach(e => csv += `${e.id};${catNames[e.category]};"${e.description}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\\n`);
+        const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
+        a.download = `vacation_${Date.now()}.csv`; a.click();
+    };
+
+    document.getElementById('importFile').onchange = e => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+            if (file.name.endsWith('.json')) expenses = JSON.parse(ev.target.result);
+            else { // CSV
+                const rows = ev.target.result.split('\\n').slice(1).filter(r => r.trim());
+                const imported = rows.map(r => {
+                    const c = r.split(';');
+                    let catKey = Object.keys(catNames).find(key => catNames[key] === c[1]) || 'other';
+                    return { id: c[0], category: catKey, description: c[2].replace(/"/g,''), amount: parseFloat(c[3]), liters: parseFloat(c[4]), pricePerLiter: parseFloat(c[5]), date: c[6] };
+                });
+                expenses = [...imported, ...expenses];
+            }
+            saveAndRender(); alert('Импорт завершен!');
+        };
+        reader.readAsText(file);
+    };
+
+    categorySelect.dispatchEvent(new Event('change')); saveAndRender();
+</script>
+</body>
+</html>
