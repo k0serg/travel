@@ -97,8 +97,10 @@
     <div class="card">
         <div class="card-title">Синхронизация и бэкап</div>
         <div class="data-actions">
-            <button type="button" class="btn-outline" onclick="exportToCSV()">📤 Экспорт</button>
-            <label for="importFile" class="btn-label-import">📥 Импорт</label>
+            <button type="button" class="btn-outline" onclick="downloadCSV()">⬇️ Скачать CSV</button>
+            <button type="button" class="btn-outline" onclick="shareCSV()">📤 Отправить</button>
+            
+            <label for="importFile" class="btn-label-import" style="grid-column: span 2;">📥 Импортировать файл</label>
         </div>
         <input type="file" id="importFile" accept=".csv, text/csv, application/json, */*" style="display: none;">
     </div>
@@ -215,35 +217,28 @@
         document.getElementById('totalAmount').textContent = `${expenses.reduce((s, e) => s + e.amount, 0).toLocaleString('ru', {minimumFractionDigits: 2, maximumFractionDigits: 2})} ₽`;
     }
 
-    // Обновленный экспорт (защита от переименования в .txt на Android)
-    window.exportToCSV = async () => {
-        if (expenses.length === 0) return alert('Нет данных для экспорта');
-        
+    // --- ЛОГИКА ЭКСПОРТА ---
+
+    // Общая функция для генерации текста CSV
+    function generateCSVText() {
+        if (expenses.length === 0) {
+            alert('Нет данных для экспорта');
+            return null;
+        }
         let csv = "\uFEFFID;Категория;Описание;Сумма;Литры;Цена;Дата\n";
         expenses.forEach(e => { 
             csv += `${e.id};${catNames[e.category] || e.category};"${e.description.replace(/"/g, '""')}";${e.amount};${e.liters||0};${e.pricePerLiter||0};${e.date}\n`; 
         });
+        return csv;
+    }
+
+    // 1. Прямое скачивание (Гарантирует правильное имя и .csv)
+    window.downloadCSV = () => {
+        const csv = generateCSVText();
+        if (!csv) return;
 
         const fileName = `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`;
-        
-        // Используем application/octet-stream, чтобы Android не менял расширение на .txt
-        const blob = new Blob([csv], { type: 'application/octet-stream' });
-        
-        if (navigator.canShare) {
-            const file = new File([blob], fileName, { type: 'application/octet-stream' });
-            if (navigator.canShare({ files: [file] })) {
-                try { 
-                    await navigator.share({ 
-                        files: [file], 
-                        title: 'Расходы', 
-                        text: 'Бэкап расходов' 
-                    }); 
-                    return; 
-                } catch (err) {
-                    console.log('Отправка отменена', err);
-                }
-            }
-        }
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         
         const a = document.createElement("a"); 
         const url = URL.createObjectURL(blob);
@@ -253,7 +248,35 @@
         a.click(); 
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 100);
+        
+        alert('Файл сохранен в папку "Загрузки" на вашем устройстве.');
     };
+
+    // 2. Отправка через системное меню (Telegram, WhatsApp и т.д.)
+    window.shareCSV = async () => {
+        const csv = generateCSVText();
+        if (!csv) return;
+
+        const fileName = `vacation_expenses_${new Date().toISOString().slice(0,10)}.csv`;
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const file = new File([blob], fileName, { type: 'text/csv' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try { 
+                await navigator.share({ 
+                    files: [file], 
+                    title: 'Расходы на отпуск', 
+                    text: 'Бэкап расходов' 
+                }); 
+            } catch (err) {
+                console.log('Отправка отменена', err);
+            }
+        } else {
+            alert('Ваш браузер не поддерживает прямую отправку. Пожалуйста, используйте кнопку "Скачать CSV".');
+        }
+    };
+
+    // --- ЛОГИКА ИМПОРТА ---
 
     // Бронебойный механизм импорта для Android
     importFileInput.addEventListener('change', function(e) {
