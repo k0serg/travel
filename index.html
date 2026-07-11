@@ -201,24 +201,79 @@
         a.download = `vacation_${Date.now()}.csv`; a.click();
     };
 
-    document.getElementById('importFile').onchange = e => {
-        const file = e.target.files[0]; if(!file) return;
+document.getElementById('importFile').addEventListener('change', function(e) {
+        const file = e.target.files[0]; 
+        if (!file) return;
+
         const reader = new FileReader();
-        reader.onload = ev => {
-            if (file.name.endsWith('.json')) expenses = JSON.parse(ev.target.result);
-            else { // CSV
-                const rows = ev.target.result.split('\\n').slice(1).filter(r => r.trim());
-                const imported = rows.map(r => {
-                    const c = r.split(';');
-                    let catKey = Object.keys(catNames).find(key => catNames[key] === c[1]) || 'other';
-                    return { id: c[0], category: catKey, description: c[2].replace(/"/g,''), amount: parseFloat(c[3]), liters: parseFloat(c[4]), pricePerLiter: parseFloat(c[5]), date: c[6] };
-                });
-                expenses = [...imported, ...expenses];
+        
+        reader.onload = function(ev) {
+            try {
+                const text = ev.target.result;
+                
+                // Если это JSON (резервная копия)
+                if (file.name.toLowerCase().endsWith('.json')) {
+                    const parsed = JSON.parse(text);
+                    if (Array.isArray(parsed)) {
+                        expenses = parsed;
+                    } else {
+                        throw new Error('Файл не содержит массив данных');
+                    }
+                } 
+                // Если это CSV
+                else { 
+                    // Разбиваем строки (поддерживает и Windows \r\n, и Mac/Linux \n)
+                    const rows = text.split(/\r?\n/).filter(r => r.trim() !== '');
+                    
+                    if (rows.length <= 1) {
+                        throw new Error('Файл пуст или содержит только заголовки');
+                    }
+
+                    const imported = [];
+                    // Начинаем с i = 1, чтобы пропустить строку заголовков
+                    for (let i = 1; i < rows.length; i++) {
+                        const c = rows[i].split(';');
+                        
+                        // Если в строке есть данные
+                        if (c.length >= 4) {
+                            // Ищем категорию
+                            let catKey = Object.keys(catNames).find(key => catNames[key] === c[1]) || 'other';
+                            
+                            // Очищаем описание от возможных кавычек, которые добавляет Excel
+                            let cleanDesc = (c[2] || '').replace(/^"|"$/g, '').replace(/""/g, '"');
+                            
+                            imported.push({
+                                id: c[0] || Date.now().toString() + i,
+                                category: catKey,
+                                description: cleanDesc,
+                                amount: parseFloat(c[3]) || 0,
+                                liters: parseFloat(c[4]) || 0,
+                                pricePerLiter: parseFloat(c[5]) || 0,
+                                date: c[6] || new Date().toISOString()
+                            });
+                        }
+                    }
+                    
+                    if (imported.length === 0) throw new Error('Не удалось найти данные в файле');
+                    
+                    // Добавляем импортированные данные к текущим
+                    expenses = [...imported, ...expenses];
+                }
+                
+                saveAndRender(); 
+                alert(`Успешно импортировано записей!`);
+                
+            } catch (error) {
+                alert('Ошибка при импорте: ' + error.message);
+                console.error('Детали ошибки:', error);
             }
-            saveAndRender(); alert('Импорт завершен!');
         };
+        
         reader.readAsText(file);
-    };
+        
+        // Сбрасываем поле выбора файла, чтобы можно было выбрать этот же файл повторно
+        this.value = '';
+    });
 
     categorySelect.dispatchEvent(new Event('change')); saveAndRender();
 </script>
